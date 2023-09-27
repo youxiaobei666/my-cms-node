@@ -14,6 +14,7 @@ var indexRouter = require("./routes/index");
 var loginRouter = require("./routes/login");
 var profileRouter = require("./routes/profile");
 var userInfoRouter = require("./routes/userInfo");
+var uploadRouter = require('./routes/upload')
 
 var app = express();
 
@@ -28,7 +29,7 @@ app.use(
     secret: MY_SECRET_KEY,
     algorithms: ["HS256"], // 加密算法
   }).unless({
-    path: ["/", "/login"], //除了这些地址，其他的URL都需要验证
+    path: ["/", "/login", /^\/public\/uploads\/.*/], //除了这些地址，其他的URL都需要验证
   })
 );
 
@@ -36,13 +37,15 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 // 使用 bodyParser
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, "public")));
+// app.use('/uploads', express.static('uploads'));
+app.use('/public/uploads', express.static(path.join(__dirname, "public/uploads")));
 
 // 注册路由
 app.use("/", indexRouter);
 app.use("/login", loginRouter);
 app.use("/profile", profileRouter);
 app.use("/userinfo", userInfoRouter);
+app.use('/upload', uploadRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
