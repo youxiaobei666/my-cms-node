@@ -28,9 +28,6 @@ connection.query(selectAllUser, (err, res) => {
   userInfo = res;
 });
 
-// 断开数据库
-connection.end();
-
 // 生成以下路由
 const router = express.Router();
 
@@ -41,18 +38,6 @@ const router = express.Router();
  */
 
 router.get("/", (req, res) => {
-  // 设置 跨域
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Content-Type, Content-Length, Authorization, Accept, X-Requested-With"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "PUT, POST, GET, DELETE, OPTIONS"
-  );
-  console.log(userInfo);
-
   // 返回token
   res.json({
     message: "获取所有用户表成功!",
@@ -62,6 +47,132 @@ router.get("/", (req, res) => {
     },
     success: true,
   });
+});
+
+/**
+ * 修改用户信息
+ */
+router.post("/save", (req, res) => {
+  const { age, city, email, hobby, id, img, name } = req.body;
+
+  if (!id) {
+    return res.status(400).json({
+      message: "ID 是必须的",
+      success: false,
+    });
+  }
+
+  let updateFields = [];
+  let updateValues = [];
+
+  if (age) {
+    updateFields.push("age = ?");
+    updateValues.push(age);
+  }
+  if (city) {
+    updateFields.push("city = ?");
+    updateValues.push(city);
+  }
+  if (email) {
+    updateFields.push("email = ?");
+    updateValues.push(email);
+  }
+  if (hobby) {
+    updateFields.push("hobby = ?");
+    updateValues.push(hobby);
+  }
+  if (img) {
+    updateFields.push("img = ?");
+    updateValues.push(img);
+  }
+  if (name) {
+    updateFields.push("name = ?");
+    updateValues.push(name);
+  }
+
+  if (updateFields.length === 0) {
+    return res.status(400).json({
+      message: "至少包含一个非空的字段",
+      success: false,
+    });
+  }
+  const updateUser = `UPDATE proj_1_14.users SET ${updateFields.join(
+    ","
+  )} WHERE id = ?`;
+  updateValues.push(id);
+
+  connection.query(updateUser, updateValues, (err) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({
+        success: false,
+        data: {
+          message: "更新用户信息时出错",
+          success: false,
+        },
+      });
+    }
+
+    res.json({
+      success: true,
+      code: 200,
+      data: {
+        message: "用户信息更新成功！",
+        success: true,
+      },
+    });
+  });
+});
+
+/**
+ * 删除用户，根据 id
+ */
+router.delete("/delete/:id", async (req, res) => {
+  const userId = req.params.id;
+
+  if (!userId) {
+    return res.status(400).json({
+      success: true,
+      data: {
+        message: "id 必传",
+        success: true,
+      },
+    });
+  }
+
+  try {
+    const deleteUser = "DELETE FROM users WHERE id = ?";
+    const [result] = await connection.promise().query(deleteUser, [userId]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        data: {
+          message: "用户未找到",
+          success: false,
+        },
+      });
+    }
+
+    const [allUsers] = await connection.promise().query(selectAllUser);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        message: "用户删除成功",
+        success: true,
+        users: allUsers,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      data: {
+        message: "删除失败",
+        success: false,
+      },
+    });
+  }
 });
 
 // 导出这个路由

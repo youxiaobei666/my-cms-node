@@ -66,16 +66,6 @@ router.post("/", (req, res) => {
   const token = jwt.sign({ ID: user.id }, MY_SECRET_KEY, {
     expiresIn: 2 * 3600 * 1000,
   });
-  // 设置 跨域
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Content-Type, Content-Length, Authorization, Accept, X-Requested-With"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "PUT, POST, GET, DELETE, OPTIONS"
-  );
   // 返回token
   res.json({
     message: "yeah!登陆成功!",

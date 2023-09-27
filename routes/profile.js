@@ -113,7 +113,6 @@ const router = express.Router();
 
 router.get("/", (req, res) => {
   // 解构数据
-
   {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader(
