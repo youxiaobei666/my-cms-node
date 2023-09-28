@@ -1,3 +1,4 @@
+
 /**
  * 获取用户信息
  */
@@ -8,80 +9,6 @@ const express = require("express");
 const mysql2 = require("mysql2");
 // 定义所有用户信息列表
 let userInfo = {};
-// 定义路由表
-const adminRouterList = [
-  {
-    path: "/user",
-    redirect: "/manage",
-    meta: {
-      title: "user",
-      icon: "user",
-    },
-    props: {
-      default: false,
-    },
-    children: [
-      {
-        path: "/user/manage",
-        name: "userManage",
-        meta: {
-          title: "userManage",
-          icon: "userManage",
-        },
-        children: [],
-      },
-      {
-        path: "/user/role",
-        name: "userRole",
-        meta: {
-          title: "roleList",
-          icon: "roleList",
-        },
-        children: [],
-      },
-      {
-        path: "/user/permission",
-        name: "userPermission",
-        meta: {
-          title: "permissionList",
-          icon: "permissionList",
-        },
-        children: [],
-      },
-    ],
-  },
-  {
-    path: "/article",
-    redirect: "/article/ranking",
-    meta: {
-      title: "article",
-      icon: "article",
-    },
-    props: {
-      default: false,
-    },
-    children: [
-      {
-        path: "/article/ranking",
-        name: "articleRanking",
-        meta: {
-          title: "articleRanking",
-          icon: "articleRanking",
-        },
-        children: [],
-      },
-      {
-        path: "/article/create",
-        name: "articleCreate",
-        meta: {
-          title: "articleCreate",
-          icon: "articleCreate",
-        },
-        children: [],
-      },
-    ],
-  },
-];
 
 // 配置数据库
 const connection = mysql2.createConnection({
@@ -103,7 +30,6 @@ connection.query(getUserInfo, (err, res) => {
   }
   // 赋值给 users
   userInfo = res[0];
-  userInfo.adminRouterList = adminRouterList;
 });
 
 // 断开数据库
@@ -112,18 +38,15 @@ connection.end();
 const router = express.Router();
 
 router.get("/", (req, res) => {
-  // 解构数据
-  {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader(
-      "Access-Control-Allow-Headers",
-      "Content-Type, Content-Length, Authorization, Accept, X-Requested-With"
-    );
-    res.setHeader(
-      "Access-Control-Allow-Methods",
-      "PUT, POST, GET, DELETE, OPTIONS"
-    );
-  }
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Content-Length, Authorization, Accept, X-Requested-With"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "PUT, POST, GET, DELETE, OPTIONS"
+  );
 
   res.json({
     message: "请求用户数据成功！",

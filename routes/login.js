@@ -53,11 +53,12 @@ const router = express.Router();
 router.post("/", (req, res) => {
   // 解构数据
   const { username, password } = req.body;
-  console.log(req.body);
   // 判断密码和用户名是否正确
   const user = users.find((item) => {
     return item.username === username && item.password === password;
   });
+   // 将 permission 字符串转换为逗号分隔的数组
+   const permissionsNameList = user.permission.split(",");
   // 鉴权失败
   if (!user) {
     return res.status(401).json({ message: "鉴权失败，用户名或者密码错误！" });
@@ -72,6 +73,7 @@ router.post("/", (req, res) => {
     code: 200,
     data: {
       token,
+      permissionsNameList
     },
     success: true,
   });
